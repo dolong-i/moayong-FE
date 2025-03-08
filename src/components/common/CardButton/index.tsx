@@ -29,7 +29,7 @@ export const CardButton = ({
       <div className="p-5 flex flex-col gap-2">
         <div>{icon}</div>
         <div>
-          <p className="label-md text-gray-90 pb-1 break-keep">{title}</p>
+          <p className="label-md text-gray-90 pb-1 whitespace-pre-line">{title}</p>
           <p className="caption-md text-gray-50">{subTitle}</p>
         </div>
       </div>

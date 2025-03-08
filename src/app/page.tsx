@@ -2,15 +2,17 @@
 
 import Button from "src/_components/Button";
 import { CardButton } from "src/components/common/CardButton";
-import { Calendar as CalendarIcon } from "src/components/icons/Calendar";
-import { Bulb as BulbIcon } from "src/components/icons/Bulb";
 import { Badge } from "src/components/common/Badge";
 import Image from "next/image";
-import DragronImage from "src/assets/images/dragon.png";
+import DragonImage from "src/assets/images/dragon.png";
+import { CoinIcon, CalendarIcon, BulbIcon, LogoIcon } from "src/components/common/Icons";
 
 export default function Home() {
   return (
-    <div className="flex flex-col gap-4 bg-gray-5 min-h-screen">
+    <div className="flex flex-col bg-gray-5 min-h-screen">
+      <div className="pt-5 pb-3 border-b bg-white px-5">
+        <LogoIcon />
+      </div>
       <section className="py-6 px-5 rounded-b-2xl bg-white">
         <div className="pb-6 flex flex-col gap-1">
           <p className="title-xs text-gray-50">2월 3주차 저축 도전 중🔥 </p>
@@ -22,9 +24,11 @@ export default function Home() {
             <div>그래프</div>
           </div>
           <div className="flex-1">
-            <div>돈</div>
+            <div className="p-1 ">
+              <CoinIcon />
+            </div>
             <p className="caption-md text-gray-70">누적 저축 금액</p>
-            <p className="title-sm text-gray-80">1000원</p>
+            <p className="title-sm text-gray-80">1,000,000원</p>
           </div>
         </div>
         <div>
@@ -62,7 +66,7 @@ export default function Home() {
             </div>
           </div>
           <div>
-            <Image src={DragronImage} alt="용" width={94} height={104} />
+            <Image src={DragonImage} alt="용" width={94} height={104} />
           </div>
         </div>
       </section>

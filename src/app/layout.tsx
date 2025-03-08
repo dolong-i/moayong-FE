@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import TanstackProviders from "src/_lib/tanstackProviders";
-import 'src/app/globals.css';
+import "src/app/globals.css";
 
 export const metadata: Metadata = {
   title: "모아용",
@@ -14,10 +14,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={"antialiased"}>
-        <TanstackProviders>
-          {children}
-        </TanstackProviders>
+      <body className="antialiased bg-gray-0 font-pretendard">
+        <TanstackProviders>{children}</TanstackProviders>
       </body>
     </html>
   );
