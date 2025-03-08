@@ -31,9 +31,7 @@ export default function Home() {
             <p className="title-sm text-gray-80">1,000,000원</p>
           </div>
         </div>
-        <div>
-          <Button.Icon> 바로 저축 인증하기</Button.Icon>
-        </div>
+        <Button.Icon className="w-full"> 바로 저축 인증하기</Button.Icon>
       </section>
 
       <section className="p-5  flex flex-col gap-4">
