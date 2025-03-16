@@ -1,26 +1,31 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import InputSlide from 'src/_components/register/InputSlide';
-import { motion } from 'framer-motion';
-import AccountTypeSelect from 'src/_components/register/AccountTypeSelect';
-import { Button } from 'src/components/ui/button';
-import { Input } from 'src/components/ui/input';
-import { Sheet, SheetContent, SheetTrigger } from 'src/components/ui/sheet';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'src/components/ui/select';
-import Image from 'next/image';
-import backbar from 'src/assets/appbar.svg'
-import x from 'src/assets/icon-x.svg'
-import AccountVerification from 'src/_components/register/AccountVerification';
-import PassbookVerification from 'src/_components/register/PassbookVerification';
-import SuccessPopup from 'src/_components/SuccessPopup';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import InputSlide from "src/_components/register/InputSlide";
+import { motion } from "framer-motion";
+import AccountTypeSelect from "src/_components/register/AccountTypeSelect";
+import { Button } from "src/components/ui/button";
+import { Input } from "src/components/ui/input";
+import { Sheet, SheetContent, SheetTrigger } from "src/components/ui/sheet";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "src/components/ui/select";
+import Image from "next/image";
+import backbar from "src/assets/appbar.svg";
+import x from "src/assets/icon-x.svg";
+import AccountVerification from "src/_components/register/AccountVerification";
+import PassbookVerification from "src/_components/register/PassbookVerification";
+import SuccessPopup from "src/_components/SuccessPopup";
+import { getMe } from "src/_api/api";
 
 const mockApiRequest: any = async () => {
   // 목데이터 응답
-  return new Promise((resolve) =>
-    setTimeout(() => resolve({ success: true }), 1000)
-  );
+  return new Promise((resolve) => setTimeout(() => resolve({ success: true }), 1000));
 };
 
 const RegisterPage = () => {
@@ -28,21 +33,45 @@ const RegisterPage = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [inputValues, setInputValues] = useState<any>({});
   const totalSlides = 8;
-  const slideLabels = ['이름', '닉네임', '월 급여', '월 저축 목표', '저축 통장', '계좌 번호', '이미지 업로드', '완료'];
-  const keys = ["name", "nickname", "salary", "savingGoal", "savingType", "account", "imageUploded"];
+  const slideLabels = [
+    "이름",
+    "닉네임",
+    "월 급여",
+    "월 저축 목표",
+    "저축 통장",
+    "계좌 번호",
+    "이미지 업로드",
+    "완료",
+  ];
+  const keys = [
+    "name",
+    "nickname",
+    "salary",
+    "savingGoal",
+    "savingType",
+    "account",
+    "imageUploded",
+  ];
   const [showReviewPage, setShowReviewPage] = useState(false);
   const [open, setOpen] = useState(false);
-  const [savingType, setSavingType] = useState('');
-  const [accountNumber, setAccountNumber] = useState('');
+  const [savingType, setSavingType] = useState("");
+  const [accountNumber, setAccountNumber] = useState("");
   const [isGoingBack, setIsGoingBack] = useState(false);
-  const [ocrAccountNumber, setOcrAccountNumber] = useState('');
+  const [ocrAccountNumber, setOcrAccountNumber] = useState("");
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
+  useEffect(() => {
+    fetchUser();
+  }, []);
+  const fetchUser = async () => {
+    const user = await getMe();
+    console.log("유저:", user);
+  };
   const handleCloseSuccessPopup = () => {
     setShowSuccessPopup(false);
     handleCompleteRegistration();
     // 여기에 인증 내역 확인 페이지로 이동하는 로직을 추가
-  }
+  };
 
   const handleCompleteCertification = async () => {
     try {
@@ -51,7 +80,7 @@ const RegisterPage = () => {
         setShowSuccessPopup(true); // 성공 팝업 표시
       }
     } catch (error) {
-      console.error('API 요청 실패:', error);
+      console.error("API 요청 실패:", error);
     }
   };
 
@@ -80,16 +109,16 @@ const RegisterPage = () => {
       setCurrentSlide(currentSlide - 1);
       return;
     }
-  }
+  };
 
   const handleCompleteRegistration = () => {
-    router.push('/onboarding');
+    router.push("/onboarding");
   };
 
   const handleEditAccountInfo = () => {
     // 바텀시트 열기 전에 현재 값으로 초기화
-    setSavingType(inputValues.savingType || '');
-    setAccountNumber(inputValues.accountNumber || '');
+    setSavingType(inputValues.savingType || "");
+    setAccountNumber(inputValues.accountNumber || "");
     setOpen(true);
   };
 
@@ -124,14 +153,16 @@ const RegisterPage = () => {
     });
     setOpen(false);
   };
-  const allDataPresent = Object.keys(inputValues).length > 0 && Object.keys(inputValues).every((key) => {
-    return keys.every((key) => {
-      if (key === 'account' || key === 'imageUploded') {
-        return inputValues['imageUploded']?.ocrResult?.accountNumber
-      }
-      return inputValues[key];
-    })
-  });
+  const allDataPresent =
+    Object.keys(inputValues).length > 0 &&
+    Object.keys(inputValues).every((key) => {
+      return keys.every((key) => {
+        if (key === "account" || key === "imageUploded") {
+          return inputValues["imageUploded"]?.ocrResult?.accountNumber;
+        }
+        return inputValues[key];
+      });
+    });
 
   const banks = [
     { name: "KB국민은행", logo: "#" },
@@ -140,7 +171,7 @@ const RegisterPage = () => {
     { name: "KEB하나은행", logo: "#" },
     { name: "카카오뱅크", logo: "#" },
     { name: "케이뱅크", logo: "#" },
-    { name: "토스", logo: "#" }
+    { name: "토스", logo: "#" },
   ];
 
   const handleRegistrationComplete = () => {
@@ -152,10 +183,10 @@ const RegisterPage = () => {
 
   useEffect(() => {
     // 이미지 업로드 후 OCR 결과에서 계좌 번호를 초기화
-    if (inputValues['imageUploded']?.ocrResult?.accountNumber) {
-      setOcrAccountNumber(inputValues['imageUploded'].ocrResult.accountNumber);
+    if (inputValues["imageUploded"]?.ocrResult?.accountNumber) {
+      setOcrAccountNumber(inputValues["imageUploded"].ocrResult.accountNumber);
     }
-  }, [inputValues['imageUploded']?.ocrResult?.accountNumber]);
+  }, [inputValues["imageUploded"]?.ocrResult?.accountNumber]);
 
   const renderSlideContent = () => {
     const slideDirection = isGoingBack ? { opacity: 0, y: 50 } : { opacity: 1, y: 0 };
@@ -171,10 +202,10 @@ const RegisterPage = () => {
               onNext={handleNextSlide}
               initialValue={inputValues.name || ""}
               validationRules={{
-                required: '이름을 입력해주세요.',
+                required: "이름을 입력해주세요.",
                 minLength: {
                   value: 2,
-                  message: '이름은 2글자 이상 입력해야 합니다.',
+                  message: "이름은 2글자 이상 입력해야 합니다.",
                 },
               }}
               currentSlide={currentSlide}
@@ -184,26 +215,28 @@ const RegisterPage = () => {
               <motion.div
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, ease: 'easeInOut' }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
                 className="flex flex-col-reverse"
               >
-                {Object.keys(inputValues).map((key, index) => (
-                  index < 1 &&
-                  <motion.div
-                    key={key}
-                    className="mb-4"
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.1 }}
-                  >
-                    <label className="block text-sm font-medium mx-[20px] label-md mb-1 text-gray-70">
-                      {slideLabels[index]}
-                    </label>
-                    <div className="text-gray-50 border-b border-gray-30 mx-[20px] title-md pb-1">
-                      {String(inputValues[key])}
-                    </div>
-                  </motion.div>
-                ))}
+                {Object.keys(inputValues).map(
+                  (key, index) =>
+                    index < 1 && (
+                      <motion.div
+                        key={key}
+                        className="mb-4"
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: index * 0.1 }}
+                      >
+                        <label className="block text-sm font-medium mx-[20px] label-md mb-1 text-gray-70">
+                          {slideLabels[index]}
+                        </label>
+                        <div className="text-gray-50 border-b border-gray-30 mx-[20px] title-md pb-1">
+                          {String(inputValues[key])}
+                        </div>
+                      </motion.div>
+                    )
+                )}
               </motion.div>
             )}
           </>
@@ -217,10 +250,10 @@ const RegisterPage = () => {
               onNext={handleNextSlide}
               initialValue={inputValues.nickname || ""}
               validationRules={{
-                required: '닉네임을 입력해주세요.',
+                required: "닉네임을 입력해주세요.",
                 minLength: {
                   value: 2,
-                  message: '닉네임은 2글자 이상 입력해야 합니다.',
+                  message: "닉네임은 2글자 이상 입력해야 합니다.",
                 },
               }}
               currentSlide={currentSlide}
@@ -230,26 +263,28 @@ const RegisterPage = () => {
               <motion.div
                 initial={{ opacity: 0, y: -30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, ease: 'easeInOut' }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
                 className="flex flex-col-reverse"
               >
-                {Object.keys(inputValues).map((key, index) => (
-                  index < 2 &&
-                  <motion.div
-                    key={key}
-                    className="mb-4"
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.1 }}
-                  >
-                    <label className="block text-sm font-medium mx-[20px] label-md mb-1 text-gray-70">
-                      {slideLabels[index]}
-                    </label>
-                    <div className="text-gray-50 border-b border-gray-30 mx-[20px] title-md pb-1">
-                      {String(inputValues[key])}
-                    </div>
-                  </motion.div>
-                ))}
+                {Object.keys(inputValues).map(
+                  (key, index) =>
+                    index < 2 && (
+                      <motion.div
+                        key={key}
+                        className="mb-4"
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: index * 0.1 }}
+                      >
+                        <label className="block text-sm font-medium mx-[20px] label-md mb-1 text-gray-70">
+                          {slideLabels[index]}
+                        </label>
+                        <div className="text-gray-50 border-b border-gray-30 mx-[20px] title-md pb-1">
+                          {String(inputValues[key])}
+                        </div>
+                      </motion.div>
+                    )
+                )}
               </motion.div>
             )}
           </>
@@ -264,10 +299,10 @@ const RegisterPage = () => {
               onNext={handleNextSlide}
               initialValue={inputValues.salary}
               validationRules={{
-                required: '월 급여를 입력해주세요.',
+                required: "월 급여를 입력해주세요.",
                 pattern: {
                   value: /^[0-9]+$/,
-                  message: '월 급여는 숫자로만 입력해야 합니다.',
+                  message: "월 급여는 숫자로만 입력해야 합니다.",
                 },
               }}
               currentSlide={currentSlide}
@@ -277,26 +312,28 @@ const RegisterPage = () => {
               <motion.div
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, ease: 'easeInOut' }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
                 className="flex flex-col-reverse"
               >
-                {Object.keys(inputValues).map((key, index) => (
-                  index < 3 &&
-                  <motion.div
-                    key={key}
-                    className="mb-4"
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.1 }}
-                  >
-                    <label className="block text-sm font-medium mx-[20px] label-md mb-1 text-gray-70">
-                      {slideLabels[index]}
-                    </label>
-                    <div className="text-gray-50 border-b border-gray-30 mx-[20px] title-md pb-1">
-                      {String(inputValues[key])}
-                    </div>
-                  </motion.div>
-                ))}
+                {Object.keys(inputValues).map(
+                  (key, index) =>
+                    index < 3 && (
+                      <motion.div
+                        key={key}
+                        className="mb-4"
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: index * 0.1 }}
+                      >
+                        <label className="block text-sm font-medium mx-[20px] label-md mb-1 text-gray-70">
+                          {slideLabels[index]}
+                        </label>
+                        <div className="text-gray-50 border-b border-gray-30 mx-[20px] title-md pb-1">
+                          {String(inputValues[key])}
+                        </div>
+                      </motion.div>
+                    )
+                )}
               </motion.div>
             )}
           </>
@@ -317,7 +354,7 @@ const RegisterPage = () => {
               validationRules={{
                 min: {
                   value: 10,
-                  message: '최소 10% 이상 저축해야 합니다.',
+                  message: "최소 10% 이상 저축해야 합니다.",
                 },
               }}
             />
@@ -325,26 +362,28 @@ const RegisterPage = () => {
               <motion.div
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, ease: 'easeInOut' }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
                 className="flex flex-col-reverse"
               >
-                {Object.keys(inputValues).map((key, index) => (
-                  index < 4 &&
-                  <motion.div
-                    key={key}
-                    className="mb-4"
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.1 }}
-                  >
-                    <label className="block text-sm font-medium mx-[20px] label-md mb-1 text-gray-70">
-                      {slideLabels[index]}
-                    </label>
-                    <div className="text-gray-50 border-b border-gray-30 mx-[20px] title-md pb-1">
-                      {String(inputValues[key])}
-                    </div>
-                  </motion.div>
-                ))}
+                {Object.keys(inputValues).map(
+                  (key, index) =>
+                    index < 4 && (
+                      <motion.div
+                        key={key}
+                        className="mb-4"
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: index * 0.1 }}
+                      >
+                        <label className="block text-sm font-medium mx-[20px] label-md mb-1 text-gray-70">
+                          {slideLabels[index]}
+                        </label>
+                        <div className="text-gray-50 border-b border-gray-30 mx-[20px] title-md pb-1">
+                          {String(inputValues[key])}
+                        </div>
+                      </motion.div>
+                    )
+                )}
               </motion.div>
             )}
           </>
@@ -353,35 +392,37 @@ const RegisterPage = () => {
         return (
           <>
             <AccountTypeSelect
-              initialBankName={inputValues.savingType || ''}
+              initialBankName={inputValues.savingType || ""}
               onSelect={(savingType) => {
-                handleNextSlide('savingType', savingType);
+                handleNextSlide("savingType", savingType);
               }}
             />
             {Object.keys(inputValues).length > 0 && (
               <motion.div
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, ease: 'easeInOut' }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
                 className="flex flex-col-reverse"
               >
-                {Object.keys(inputValues).map((key, index) => (
-                  index < 5 &&
-                  <motion.div
-                    key={key}
-                    className="mb-4"
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.1 }}
-                  >
-                    <label className="block text-sm font-medium mx-[20px] label-md mb-1 text-gray-70">
-                      {slideLabels[index]}
-                    </label>
-                    <div className="text-gray-50 border-b border-gray-30 mx-[20px] title-md pb-1">
-                      {String(inputValues[key])}
-                    </div>
-                  </motion.div>
-                ))}
+                {Object.keys(inputValues).map(
+                  (key, index) =>
+                    index < 5 && (
+                      <motion.div
+                        key={key}
+                        className="mb-4"
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: index * 0.1 }}
+                      >
+                        <label className="block text-sm font-medium mx-[20px] label-md mb-1 text-gray-70">
+                          {slideLabels[index]}
+                        </label>
+                        <div className="text-gray-50 border-b border-gray-30 mx-[20px] title-md pb-1">
+                          {String(inputValues[key])}
+                        </div>
+                      </motion.div>
+                    )
+                )}
               </motion.div>
             )}
           </>
@@ -393,8 +434,8 @@ const RegisterPage = () => {
               label="계좌번호:"
               keyName="account"
               type="number"
-              onClick={(ocrResult) => handleNextSlide('imageUploded', ocrResult)}
-              onNext={() => { }}
+              onClick={(ocrResult) => handleNextSlide("imageUploded", ocrResult)}
+              onNext={() => {}}
               handleSccess={handleRegistrationComplete}
               allDataPresent={allDataPresent}
               initialValue={inputValues.savingGoal}
@@ -415,32 +456,32 @@ const RegisterPage = () => {
               <motion.div
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, ease: 'easeInOut' }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
                 className="flex flex-col-reverse"
               >
-                {Object.keys(inputValues).map((key, index) => (
-                  index < 6 &&
-                  <motion.div
-                    key={key}
-                    className="mb-4"
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.1 }}
-                  >
-                    <label className="block text-sm font-medium mx-[20px] label-md mb-1 text-gray-70 mt-[8px]">
-                      {slideLabels[index]}
-                    </label>
-                    <div className="text-gray-50 border-b border-gray-30 mx-[20px] title-md pb-1">
-                      {
-                        inputValues[key]?.ocrResult?.accountNumber
-                          ? String(inputValues[key]?.ocrResult?.accountNumber)
-                          : typeof inputValues[key] === "object" && inputValues[key] !== null
+                {Object.keys(inputValues).map(
+                  (key, index) =>
+                    index < 6 && (
+                      <motion.div
+                        key={key}
+                        className="mb-4"
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: index * 0.1 }}
+                      >
+                        <label className="block text-sm font-medium mx-[20px] label-md mb-1 text-gray-70 mt-[8px]">
+                          {slideLabels[index]}
+                        </label>
+                        <div className="text-gray-50 border-b border-gray-30 mx-[20px] title-md pb-1">
+                          {inputValues[key]?.ocrResult?.accountNumber
+                            ? String(inputValues[key]?.ocrResult?.accountNumber)
+                            : typeof inputValues[key] === "object" && inputValues[key] !== null
                             ? ""
-                            : String(inputValues[key]) || ""
-                      }
-                    </div>
-                  </motion.div>
-                ))}
+                            : String(inputValues[key]) || ""}
+                        </div>
+                      </motion.div>
+                    )
+                )}
               </motion.div>
             )}
           </>
@@ -448,10 +489,7 @@ const RegisterPage = () => {
       case 6: // 새로운 창이 떠야함 (화면 전체를 덮는 모달 - 통장 인증, 최종 결과)
         return (
           <>
-            <PassbookVerification
-              keyName="imageUploded"
-              onClick={handleNextSlide}
-            />
+            <PassbookVerification keyName="imageUploded" onClick={handleNextSlide} />
           </>
         );
       case 7: // 새로운 창이 떠야함 (화면 전체를 덮는 모달 - 통장 인증, 최종 결과)
@@ -478,25 +516,27 @@ const RegisterPage = () => {
                     // TODO: w-[320], h-[280px] w-fit, h-fit 시안 논의
                     className="rounded-[16px] w-[320px] h-[280px] object-cover mb-[24px] shadow-lg"
                     style={{
-                      objectPosition: '50% 15%',
-                      boxShadow: '0 0px 1px #CDD1D5, 0 4px 2px #CDD1D5',
+                      objectPosition: "50% 15%",
+                      boxShadow: "0 0px 1px #CDD1D5, 0 4px 2px #CDD1D5",
                     }}
                   />
 
                   {/* 하이라이트 박스 렌더링 */}
-                  {inputValues.imageUploded.ocrResult?.highlightBoxes?.map((box: any, index: any) => (
-                    <div
-                      key={index}
-                      style={{
-                        position: 'absolute',
-                        top: box.y,
-                        left: box.x,
-                        width: box.width,
-                        height: box.height,
-                        border: '2px solid red', // 하이라이트 색상
-                      }}
-                    />
-                  ))}
+                  {inputValues.imageUploded.ocrResult?.highlightBoxes?.map(
+                    (box: any, index: any) => (
+                      <div
+                        key={index}
+                        style={{
+                          position: "absolute",
+                          top: box.y,
+                          left: box.x,
+                          width: box.width,
+                          height: box.height,
+                          border: "2px solid red", // 하이라이트 색상
+                        }}
+                      />
+                    )
+                  )}
                 </div>
               )}
 
@@ -561,9 +601,9 @@ const RegisterPage = () => {
                 </div>
               </div> */}
               <div className="fixed bottom-[20px] left-0 right-0">
-                <div className='flex flex-col justify-center items-center'>
-                  <p className='title-xs text-gray-80'>김모아님 통장 계좌번호와</p>
-                  <p className='title-xs text-gray-80'>잔액이 맞는지 다시 한번 확인해주세요.</p>
+                <div className="flex flex-col justify-center items-center">
+                  <p className="title-xs text-gray-80">김모아님 통장 계좌번호와</p>
+                  <p className="title-xs text-gray-80">잔액이 맞는지 다시 한번 확인해주세요.</p>
                 </div>
 
                 <div className="flex justify-center gap-[4px] mt-[24px]">
@@ -573,20 +613,30 @@ const RegisterPage = () => {
                         수정하기
                       </Button>
                     </SheetTrigger>
-                    <SheetContent side="bottom" className="sm:max-w-full border-t border-[#EDEFF1] h-[405px] bg-white p-[20px] rounded-t-xl">
+                    <SheetContent
+                      side="bottom"
+                      className="sm:max-w-full border-t border-[#EDEFF1] h-[405px] bg-white p-[20px] rounded-t-xl"
+                    >
                       <div className="h-1 w-[60px] bg-[#EDEFF1] mx-auto rounded-full mb-[20px]"></div>
                       <div className="flex flex-col h-full justify-between">
                         <div className="mt-[15px]">
-                          <h3 className='text-gray-80 title-sm mb-[24px]'>계좌 수정하기</h3>
+                          <h3 className="text-gray-80 title-sm mb-[24px]">계좌 수정하기</h3>
                           <div>
-                            <span className='label-md text-gray-70'>저축 통장</span>
-                            <Select onValueChange={setSavingType} defaultValue={inputValues.savingType}>
+                            <span className="label-md text-gray-70">저축 통장</span>
+                            <Select
+                              onValueChange={setSavingType}
+                              defaultValue={inputValues.savingType}
+                            >
                               <SelectTrigger className="pb-[12px] border-b border-[#B1B8BE] border-x-transparent border-t-transparent shadow-none rounded-none title-md text-gray-50 pl-0 py-6">
                                 <SelectValue placeholder="선택하세요" />
                               </SelectTrigger>
                               <SelectContent>
                                 {banks.map((bank) => (
-                                  <SelectItem key={bank.name} value={bank.name} className="flex items-center cursor-pointer hover:bg-gray-5 active:bg-gray-10 rounded-[16px] py-[10px]">
+                                  <SelectItem
+                                    key={bank.name}
+                                    value={bank.name}
+                                    className="flex items-center cursor-pointer hover:bg-gray-5 active:bg-gray-10 rounded-[16px] py-[10px]"
+                                  >
                                     <div
                                       key={bank.name}
                                       className="flex items-center ursor-pointer hover:bg-gray-5 active:bg-gray-10 rounded-[16px] py-[10px]"
@@ -602,8 +652,8 @@ const RegisterPage = () => {
                               </SelectContent>
                             </Select>
                           </div>
-                          <div className='mt-[24px]'>
-                            <span className='label-md text-gray-70'>계좌번호</span>
+                          <div className="mt-[24px]">
+                            <span className="label-md text-gray-70">계좌번호</span>
                             <Input
                               type="text"
                               id="account-number"
@@ -613,20 +663,27 @@ const RegisterPage = () => {
                               className="pb-[12px] border-b border-[#B1B8BE] border-x-transparent border-t-transparent shadow-none rounded-none title-md text-gray-50 pl-0 py-4"
                             />
                           </div>
-
                         </div>
                         <div className="flex items-center justify-center p-[20px]">
-                          <Button size={"large"} onClick={() => {
-                            handleUpdateAccount()
-                            handlePrevSlide()
-                          }}>수정 완료</Button>
+                          <Button
+                            size={"large"}
+                            onClick={() => {
+                              handleUpdateAccount();
+                              handlePrevSlide();
+                            }}
+                          >
+                            수정 완료
+                          </Button>
                         </div>
                       </div>
                     </SheetContent>
                   </Sheet>
-                  <Button size={"small"} onClick={() => {
-                    handlePrevSlide()
-                  }}>
+                  <Button
+                    size={"small"}
+                    onClick={() => {
+                      handlePrevSlide();
+                    }}
+                  >
                     인증완료
                   </Button>
                 </div>
@@ -641,27 +698,24 @@ const RegisterPage = () => {
 
   return (
     <div className="flex flex-col items-left justify-start overflow-auto pb-[20px]">
-      <div className='h-[50px] w-full flex items-center pl-[9px]'>
-        <button onClick={handlePrevSlide} className='z-10'>
+      <div className="h-[50px] w-full flex items-center pl-[9px]">
+        <button onClick={handlePrevSlide} className="z-10">
           <Image src={currentSlide > 5 ? x : backbar} alt="" />
         </button>
-        {
-          currentSlide >= 5 && <p className='title-sm text-gray-80 text-center w-full ml-[-36px]'>통장인증</p>
-        }
+        {currentSlide >= 5 && (
+          <p className="title-sm text-gray-80 text-center w-full ml-[-36px]">통장인증</p>
+        )}
       </div>
-      {
-        currentSlide <= 5 && (
-          <div className='pl-[20px] mb-1 mt-[40px] label-sm'>
-            <span className='text-gray-80 mr-1'>{currentSlide + 1 > 5 ? 5 : currentSlide + 1}</span>
-            <span className='text-gray-30'>/</span>
-            <span className='text-gray-30'>
-              {/* TODO: 정책 협의 */}
-              {/* {slideLabels.length} */}
-              5
-            </span>
-          </div>
-        )
-      }
+      {currentSlide <= 5 && (
+        <div className="pl-[20px] mb-1 mt-[40px] label-sm">
+          <span className="text-gray-80 mr-1">{currentSlide + 1 > 5 ? 5 : currentSlide + 1}</span>
+          <span className="text-gray-30">/</span>
+          <span className="text-gray-30">
+            {/* TODO: 정책 협의 */}
+            {/* {slideLabels.length} */}5
+          </span>
+        </div>
+      )}
       <div className="w-full max-w-md text-left heading-sm mb-[32px] pl-[20px]">
         <p className={`${currentSlide === 0 ? "block" : "hidden"}`}>
           당신의 <br /> 이름을 알려주세요.
@@ -683,9 +737,7 @@ const RegisterPage = () => {
       {renderSlideContent()}
 
       {/* 성공 팝업 */}
-      {showSuccessPopup && (
-        <SuccessPopup onClose={handleCloseSuccessPopup} name={'도롱이'} />
-      )}
+      {showSuccessPopup && <SuccessPopup onClose={handleCloseSuccessPopup} name={"도롱이"} />}
     </div>
   );
 };

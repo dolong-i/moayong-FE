@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import OnboardingSlider from "src/_components/OnboardingSlider";
 
