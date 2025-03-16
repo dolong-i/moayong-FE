@@ -25,23 +25,32 @@ export interface OnboardingRequest {
   savingsBank: string;
   monthlySalary: number;
   savingsRate: number;
-  accountNumber: string;
+  accountNumber: number;
 }
 
 // User Types
-export interface User {
+export interface UserResponse {
   id: number;
+  provider: string;
   email: string;
   name: string;
   nickname: string;
   monthlySalary: number;
   savingsRate: number;
+  savingsBank: string;
+  accountNumber: number;
 }
 
-export interface UserAccount {
+export interface UserPutRequest {
+  nickname: string;
+  monthlySalary: number;
+  savingsRate: number;
+}
+
+export interface UserAccountPutRequest {
   savingsBank: string;
   savingsAmount: number;
-  accountNumber: string;
+  accountNumber: number;
 }
 
 // League Types

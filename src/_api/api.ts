@@ -5,8 +5,9 @@ import type {
   OnboardingRequest,
   Quiz,
   SavingsTransaction,
-  User,
-  UserAccount,
+  UserResponse,
+  UserPutRequest,
+  UserAccountPutRequest,
   VerificationResult,
   VerificationStatus,
 } from "src/_types/type";
@@ -32,7 +33,7 @@ export const api = axios.create({
 // 인터셉터 추가
 api.interceptors.request.use(
   (config) => {
-    // console.log("Request config:", config); // 요청 디버깅
+    console.log("Request config:", config); // 요청 디버깅
     const token = document.cookie.match(/(?:^|; )token=([^;]*)/)?.[1];
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -89,7 +90,7 @@ api.interceptors.response.use(
         return api(error.config);
       } catch (refreshError) {
         console.error("Refresh token error:", refreshError);
-        window.location.href = "/login";
+        // window.location.href = "/login";
       }
     }
 
@@ -106,15 +107,16 @@ export const logout = () => api.post("/auth/logout");
 export const refresh = () => api.post("/auth/refresh");
 
 // User APIs
-export const getUsers = () => api.get<User[]>("/users");
+export const getUsers = () => api.get<UserResponse[]>("/users");
 
-export const getUser = (id: number) => api.get<User>(`/users/${id}`);
+export const getUser = (id: number) => api.get<UserResponse>(`/users/${id}`);
 
-export const updateUser = (id: number, data: Partial<User>) => api.put(`/users/${id}`, data);
+export const updateUser = (id: number, data: Partial<UserPutRequest>) =>
+  api.put(`/users/${id}`, data);
 
-export const getMe = () => api.get<User>("/users/me");
+export const getMe = () => api.get<UserResponse>("/users/me").then((res) => res.data);
 
-export const updateAccount = (userId: number, data: UserAccount) =>
+export const updateAccount = (userId: number, data: UserAccountPutRequest) =>
   api.put(`/users/${userId}/account`, data);
 
 export const checkNickname = (nickname: string) =>

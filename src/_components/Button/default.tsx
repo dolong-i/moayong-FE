@@ -1,13 +1,10 @@
-import React from 'react';
-import {
-  Button as ShadcnButton,
-  ButtonProps as ShadcnButtonProps,
-} from 'src/components/ui/button';
-import { cn } from 'src/lib/utils';
+import React from "react";
+import { Button as ShadcnButton, ButtonProps as ShadcnButtonProps } from "src/components/ui/button";
+import { cn } from "src/lib/utils";
 
-interface DefaultButtonProps extends Omit<ShadcnButtonProps, 'type'> {
-  buttonType?: 'primary' | 'secondary';
-  type?: 'button' | 'submit';
+interface DefaultButtonProps extends Omit<ShadcnButtonProps, "type"> {
+  buttonType?: "primary" | "secondary";
+  type?: "button" | "submit";
   customStyles?: {
     default?: string;
     hover?: string;
@@ -19,21 +16,21 @@ interface DefaultButtonProps extends Omit<ShadcnButtonProps, 'type'> {
 
 const DefaultButton: React.FC<DefaultButtonProps> = ({
   children,
-  buttonType = 'primary',
-  type = 'button',
-  size = 'medium',
+  buttonType = "primary",
+  type = "button",
+  size = "medium",
   customStyles,
   className,
   disabled,
   variant: propVariant,
-  onClick = () => { },
+  onClick = () => {},
   ...props
 }) => {
   // Shadcn 버튼의 variant와 명시적으로 타입 지정
   const variantMapping = {
-    primary: 'default' as const,
-    secondary: 'secondary' as const,
-    tertiary: 'ghost' as const
+    primary: "default" as const,
+    secondary: "secondary" as const,
+    tertiary: "ghost" as const,
   };
 
   // 명시적 variant 선택
