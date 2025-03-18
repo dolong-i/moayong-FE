@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "dev:https":"node server/index.js --https",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",

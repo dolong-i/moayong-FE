@@ -33,7 +33,6 @@ export const api = axios.create({
 // 인터셉터 추가
 api.interceptors.request.use(
   (config) => {
-    console.log("Request config:", config); // 요청 디버깅
     const token = document.cookie.match(/(?:^|; )token=([^;]*)/)?.[1];
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -47,25 +46,7 @@ api.interceptors.request.use(
 );
 
 api.interceptors.response.use(
-  async (response) => {
-    // 302 리다이렉트인 경우 수동 처리
-    if (response.status === 302) {
-      const redirectUrl = response.headers.location;
-      console.log("Redirecting to:", redirectUrl);
-
-      // 수동으로 리다이렉트된 URL로 요청
-      const redirectedResponse = await axios.get(redirectUrl, {
-        withCredentials: true,
-        headers: response.config.headers, // 기존 헤더 유지
-      });
-
-      console.log("Redirected Response:", redirectedResponse.data);
-      return redirectedResponse;
-    }
-
-    console.log("Response:", response);
-    return response;
-  },
+  async (response) => response,
   async (error) => {
     console.error("Response error:", error);
 
