@@ -1,72 +1,68 @@
-import { useState, useEffect } from 'react';
-import { Button } from 'src/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from 'src/components/ui/sheet';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'src/components/ui/select';
-import { DialogTitle } from 'src/components/ui/dialog';
+import { useState, useEffect } from "react";
+import { Button } from "src/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "src/components/ui/sheet";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "src/components/ui/select";
+import { DialogTitle } from "src/components/ui/dialog";
 import { cn } from "src/lib/utils";
-import select from 'src/assets/icon-select.svg';
-import Image from 'next/image';
+import select from "src/assets/icon-select.svg";
+import Image from "next/image";
+import { BANKS } from "src/_lib/banks";
 
 interface AccountTypeSelectProps {
   onSelect: (bankName: string) => void;
   initialBankName: string;
 }
 
-const banks = [
-  { name: "KB국민은행", logo: "#" },
-  { name: "신한은행", logo: "#" },
-  { name: "우리은행", logo: "#" },
-  { name: "KEB하나은행", logo: "#" },
-  { name: "카카오뱅크", logo: "#" },
-  { name: "케이뱅크", logo: "#" },
-  { name: "토스", logo: "#" }
-];
-
 const AccountTypeSelect = ({ onSelect, initialBankName }: AccountTypeSelectProps) => {
-  const [savingType, setSavingType] = useState(initialBankName || '');
+  const [savingsBank, setSavingsBank] = useState(initialBankName || "");
   const [open, setOpen] = useState(false);
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerHeight < 500) {  // 화면 높이가 작아지면 키보드가 열린 것으로 간주
+      if (window.innerHeight < 500) {
+        // 화면 높이가 작아지면 키보드가 열린 것으로 간주
         setIsKeyboardOpen(true);
       } else {
         setIsKeyboardOpen(false);
       }
     };
 
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
 
-    return () => window.removeEventListener('resize', handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   useEffect(() => {
-    if (initialBankName) setSavingType(initialBankName);
+    if (initialBankName) setSavingsBank(initialBankName);
   }, [initialBankName]);
 
   const handleUpdate = () => {
-    console.log('선택 완료:', savingType);
-    onSelect(savingType);
+    console.log("선택 완료:", savingsBank);
+    onSelect(savingsBank);
     setOpen(false);
   };
 
   const handleSelect = (bankName: string) => {
-    setSavingType(bankName);
+    setSavingsBank(bankName);
     onSelect(bankName);
     setOpen(false);
   };
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <label className="mx-[20px] text-green-50 label-md mb-2">
-        저축 통장
-      </label>
+      <label className="mx-[20px] text-green-50 label-md mb-2">저축 통장</label>
       <SheetTrigger asChild>
         <div className="relative w-full px-[20px]">
           <input
             type="button"
-            value={'은행을 선택해주세요.'}
+            value={"은행을 선택해주세요."}
             className={cn(
               "mb-[32px] flex h-9 w-full rounded-md border border-input bg-transparent pb-1 shadow-sm transition-colors file:border-0 file:bg-transparent file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
               "text-gray-80 text-gray-50 placeholder-gray-50 border-t-0 border-l-0 border-r-0 rounded-none shadow-none focus:outline-none border-b border-b-2 border-green-50 pl-0 title-md pb-3",
@@ -83,9 +79,11 @@ const AccountTypeSelect = ({ onSelect, initialBankName }: AccountTypeSelectProps
           />
         </div>
       </SheetTrigger>
-      <SheetContent side="bottom" className="sm:max-w-full border-t border-[#EDEFF1] h-[489px] bg-white p-6 rounded-t-xl">
-        <div className="h-1 w-[60px] bg-[#EDEFF1] mx-auto rounded-full mb-[20px]"></div>
-        <div className="flex flex-col h-full justify-between">
+      <SheetContent
+        side="bottom"
+        className="sm:max-w-full border-t border-[#EDEFF1] h-[489px] bg-white p-6 rounded-t-xl"
+      >
+        <div className="h-full overflow-y-auto">
           <div className="sr-only">
             <DialogTitle className="text-lg font-semibold">저축 통장 선택</DialogTitle>
             <p className="text-sm text-gray-500">저축 통장을 선택해주세요.</p>
@@ -97,7 +95,7 @@ const AccountTypeSelect = ({ onSelect, initialBankName }: AccountTypeSelectProps
               </label>
 
               <div className="space-y-[12px] overflow-y-auto h-[100%]">
-                {banks.map((bank) => (
+                {BANKS.map((bank) => (
                   <div
                     key={bank.name}
                     className="flex items-center cursor-pointer hover:bg-gray-5 active:bg-gray-10 rounded-[16px] py-[10px] pl-[16px]"
@@ -105,7 +103,7 @@ const AccountTypeSelect = ({ onSelect, initialBankName }: AccountTypeSelectProps
                   >
                     <div className="w-[32px] h-[32px] bg-gray-300 flex items-center justify-center rounded-full">
                       {/* 은행 로고 자리 */}
-                      <span className="text-sm">🏦</span>
+                      <Image src={bank.image} alt={bank.name} width={32} height={32} />
                     </div>
                     <span className="ml-4 text-gray-50 body-md">{bank.name}</span>
                   </div>
@@ -118,11 +116,11 @@ const AccountTypeSelect = ({ onSelect, initialBankName }: AccountTypeSelectProps
       <Button
         size={isKeyboardOpen ? "xlarge" : "large"}
         onClick={handleUpdate}
-        className={cn('fixed left-1/2 -translate-x-1/2', isKeyboardOpen ? "bottom-0" : 'bottom-5 ')}
+        className={cn("fixed left-1/2 -translate-x-1/2", isKeyboardOpen ? "bottom-0" : "bottom-5 ")}
       >
         다음
       </Button>
-    </Sheet >
+    </Sheet>
   );
 };
 

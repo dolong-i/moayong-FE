@@ -1,29 +1,35 @@
 // src/_components/register/VerificationForm.tsx
-import { useState } from 'react';
-import { Button } from 'src/components/ui/button';
-import { Input } from 'src/components/ui/input';
-import { Sheet, SheetContent, SheetTrigger } from 'src/components/ui/sheet'; // Sheet 컴포넌트 import
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'src/components/ui/select'; // Select 컴포넌트 import
+import { useState } from "react";
+import { Button } from "src/components/ui/button";
+import { Input } from "src/components/ui/input";
+import { Sheet, SheetContent, SheetTrigger } from "src/components/ui/sheet"; // Sheet 컴포넌트 import
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "src/components/ui/select"; // Select 컴포넌트 import
 
 interface VerificationFormProps {
   onComplete: (bankName: string, accountNumber: string) => void;
 }
 
 const VerificationForm = ({ onComplete }: VerificationFormProps) => {
-  const [bankName, setBankName] = useState('');
-  const [accountNumber, setAccountNumber] = useState('');
-  const [savingType, setSavingType] = useState(''); // 저축 통장 종류 상태 추가
+  const [bankName, setBankName] = useState("");
+  const [accountNumber, setAccountNumber] = useState("");
+  const [savingsBank, setSavingsBank] = useState(""); // 저축 통장 종류 상태 추가
   const [open, setOpen] = useState(false); // 바텀시트 열림/닫힘 상태 추가
 
   const handleSubmit = () => {
     // 통장 인증 로직
-    console.log('통장 인증:', bankName, accountNumber);
+    console.log("통장 인증:", bankName, accountNumber);
     onComplete(bankName, accountNumber); // 개별적으로 전달
   };
 
   const handleUpdate = () => {
     // 수정 완료 로직
-    console.log('수정 완료:', savingType, accountNumber);
+    console.log("수정 완료:", savingsBank, accountNumber);
     setOpen(false); // 바텀시트 닫기
   };
 
@@ -48,7 +54,7 @@ const VerificationForm = ({ onComplete }: VerificationFormProps) => {
       {/* 수정하기 버튼 - 바텀시트 */}
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
-          <Button >수정하기</Button>
+          <Button>수정하기</Button>
         </SheetTrigger>
         <SheetContent side="bottom" className="sm:max-w-full">
           <div className="flex flex-col h-full justify-between">
@@ -58,10 +64,13 @@ const VerificationForm = ({ onComplete }: VerificationFormProps) => {
             </div>
             <div className="px-6 py-4 space-y-4">
               <div className="grid gap-2">
-                <label htmlFor="saving-type" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                <label
+                  htmlFor="saving-type"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
                   저축 통장
                 </label>
-                <Select onValueChange={setSavingType} defaultValue={savingType}>
+                <Select onValueChange={setSavingsBank} defaultValue={savingsBank}>
                   <SelectTrigger>
                     <SelectValue placeholder="선택하세요" />
                   </SelectTrigger>
@@ -73,7 +82,10 @@ const VerificationForm = ({ onComplete }: VerificationFormProps) => {
                 </Select>
               </div>
               <div className="grid gap-2">
-                <label htmlFor="account-number" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                <label
+                  htmlFor="account-number"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
                   계좌 번호
                 </label>
                 <Input

@@ -25,7 +25,7 @@ export interface OnboardingRequest {
   savingsBank: string;
   monthlySalary: number;
   savingsRate: number;
-  accountNumber: number;
+  accountNumber: string;
 }
 
 // User Types
