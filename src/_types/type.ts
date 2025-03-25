@@ -1,3 +1,16 @@
+export enum TransactionType {
+  WITHDRAW = "WITHDRAW",
+  DEPOSIT = "DEPOSIT",
+}
+export type BankType =
+  | "KAKAO_BANK"
+  | "SHINHAN"
+  | "WOORI"
+  | "KB"
+  | "NH"
+  | "HANA"
+  | "IBK"
+  | "TOSS_BANK";
 export type UserType = {
   username: string;
   password: string;
@@ -78,14 +91,31 @@ export interface VerificationRequest {
   bank: string;
 }
 
-export interface VerificationStatus {
-  status: "PENDING" | "COMPLETED" | "FAILED";
+export interface VerificationResult {
+  id: string;
+  bank: "KAKAO_BANK" | "SHINHAN" | "WOORI" | "KB" | "NH" | "HANA" | "IBK" | "TOSS_BANK";
+  status: VerificationStatus;
+  imageUrl: string;
+  name: string | null;
+  type: TransactionType;
+  date: string | null;
+  amount: number;
+  balance: number;
 }
 
-export interface VerificationResult {
-  success: boolean;
-  message: string;
-  data: unknown;
+export interface VerificationStatusResponse {
+  id: string;
+  status: VerificationStatus;
+}
+
+export enum VerificationStatus {
+  STARTED = "STARTED", // 검증 시작
+  SYSTEM_ERROR = "SYSTEM_ERROR", // 알 수 없는 에러
+  UPLOADING_IMAGE = "UPLOADING_IMAGE", // S3에 이미지 업로드 중
+  IMAGE_UPLOAD_FAILED = "IMAGE_UPLOAD_FAILED", // S3 업로드 실패
+  PROCESSING_OCR = "PROCESSING_OCR", // OCR 처리 중
+  OCR_PROCESSING_FAILED = "OCR_PROCESSING_FAILED", // OCR 처리 실패
+  FINISHED = "FINISHED", // 검증 완료
 }
 
 // Quiz Types
@@ -106,7 +136,7 @@ export interface Problem {
 // Savings Types
 export interface SavingsTransaction {
   id: number;
-  type: "DEPOSIT" | "WITHDRAWAL";
+  type: TransactionType;
   amount: number;
   balance: number;
   datetime: string;
@@ -170,4 +200,13 @@ export interface SeasonResponse {
 export enum SeasonStatus {
   OPEN,
   CLOSED,
+}
+
+export interface SavingsRequest {
+  name: string;
+  imageUrl: string;
+  type: TransactionType;
+  datetime: string; // ISO 8601 형식 (예: "2025-03-14T10:00:00")
+  amount: number;
+  balance: number;
 }

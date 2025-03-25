@@ -18,6 +18,7 @@ import type {
   SeasonResponse,
   LeagueMemberResponse,
   MemberRankingResponse,
+  BankType,
 } from "src/_types/type";
 
 const BASE_URL = "https://api.moayong.com/api/v1";
@@ -123,7 +124,6 @@ export const getOpenLeagues = () =>
 // - **Multipart Form Data**
 // - `request`: `VerificationRequest` JSON
 // - `imgFile`: `MultipartFile` (이미지 파일)
-type BankType = "KAKAO_BANK" | "SHINHAN" | "WOORI" | "KB" | "NH" | "HANA" | "IBK" | "TOSS_BANK";
 
 export const startAccountVerification = (request: BankType, imgFile: FormData) =>
   api.post("/verification/account/start", { request, imgFile });
@@ -138,11 +138,13 @@ export const startPaymentVerification = (bank: BankType, imgFile: File) => {
       type: "application/json",
     })
   );
-  return api.post("/verification/payment/start", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+  return api
+    .post("/verification/payment/start", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+    .then((res) => res.data.data);
 };
 
 export const getAccountVerificationStatus = (verificationId: string) =>
@@ -162,8 +164,8 @@ export const getAccountVerificationResult = (verificationId: string) =>
 
 export const getPaymentVerificationResult = (verificationId: string) =>
   api
-    .get<VerificationResult>(`/verification/payment/${verificationId}/result`)
-    .then((res) => res.data);
+    .get<{ data: VerificationResult }>(`/verification/payment/${verificationId}/result`)
+    .then((res) => res.data.data);
 
 // Member APIs
 export const getAllMembers = () => api.get<LeagueMember[]>("/members").then((res) => res.data);

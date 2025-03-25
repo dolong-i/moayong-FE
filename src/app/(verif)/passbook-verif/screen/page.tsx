@@ -1,15 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "src/components/ui/button";
 import { Input } from "src/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "src/components/ui/sheet";
 import Image from "next/image";
 import { useAtom } from "jotai";
-import { selectedImageAtom, accountNumberAtom, ocrResultAtom } from "src/_store/passbookAtoms";
+import {
+  selectedImageAtom,
+  accountNumberAtom,
+  imageUrlAtom,
+  isLoadingAtom,
+  verificationStartAtom,
+  verificationResultAtom,
+} from "src/_store/passbookAtoms";
 import SuccessPopup from "src/_components/SuccessPopup";
 import x from "src/assets/icon-x.svg";
 import { useRouter } from "next/navigation";
+import { getPaymentVerificationResult, getPaymentVerificationStatus } from "src/_api/api";
+import { useQuery } from "@tanstack/react-query";
 
 const mockApiRequest: any = async () => {
   // 목데이터 응답
@@ -17,6 +26,19 @@ const mockApiRequest: any = async () => {
 };
 
 const ScreenPage = () => {
+  const [isLoading, setIsLoading] = useAtom(isLoadingAtom);
+  const [verificationStart] = useAtom(verificationStartAtom);
+  const [verificationResult, setVerificationResult] = useAtom(verificationResultAtom);
+  const [selectedImage] = useAtom(selectedImageAtom);
+  const [imageUrl] = useAtom(imageUrlAtom);
+  const [accountNumber, setAccountNumber] = useAtom(accountNumberAtom);
+  const [request, setRequest] = useState<{
+    bank: "KAKAO_BANK" | "SHINHAN" | "WOORI" | "KB" | "NH" | "HANA" | "IBK" | "TOSS_BANK";
+    imgFile: File | null;
+  }>({
+    bank: "KAKAO_BANK",
+    imgFile: null,
+  });
   const [open, setOpen] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [editData, setEditData] = useState({
@@ -26,52 +48,60 @@ const ScreenPage = () => {
   });
   const router = useRouter();
 
-  const [selectedImage] = useAtom(selectedImageAtom);
-  const [accountNumber, setAccountNumber] = useAtom(accountNumberAtom);
-  const [ocrResult, setOcrResult] = useAtom(ocrResultAtom);
+  // const handleEditAccountInfo = () => {
+  //   if (!ocrResult) return;
+  //   setEditData({
+  //     transactionDate: ocrResult.transactionDate.toString(),
+  //     transactionAmount: ocrResult.transactionAmount.toString(),
+  //     senderName: ocrResult.senderName,
+  //   });
+  //   setOpen(true);
+  // };
 
-  const handleEditAccountInfo = () => {
-    if (!ocrResult) return;
-    setEditData({
-      transactionDate: ocrResult.transactionDate.toString(),
-      transactionAmount: ocrResult.transactionAmount.toString(),
-      senderName: ocrResult.senderName,
-    });
-    setOpen(true);
-  };
+  // const handleChange = (field: keyof typeof editData, value: string) => {
+  //   setEditData((prev) => ({ ...prev, [field]: value }));
+  // };
 
-  const handleChange = (field: keyof typeof editData, value: string) => {
-    setEditData((prev) => ({ ...prev, [field]: value }));
-  };
+  // const handleUpdateAccount = () => {
+  //   setAccountNumber(editData.accountNumber);
+  //   setOpen(false);
+  //     };
 
-  const handleUpdateAccount = () => {
-    (setOcrResult as any)((prev: any) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        transactionDate: editData.transactionDate || "",
-        transactionAmount: editData.transactionAmount || "",
-        senderName: editData.senderName,
-      };
-    });
-    setOpen(false);
-  };
+  //   setOpen(false);
+  // };
 
-  const handleCompleteCertification = async () => {
-    try {
-      const response = await mockApiRequest(); // 목 API 요청
-      if (response.success) {
-        setShowSuccessPopup(true); // 성공 팝업 표시
-      }
-    } catch (error) {
-      console.error("API 요청 실패:", error);
-    }
-  };
+  // const handleCompleteCertification = async () => {
+  //   try {
+  //     const response = await mockApiRequest(); // 목 API 요청
+  //     if (response.success) {
+  //       setShowSuccessPopup(true); // 성공 팝업 표시
+  //     }
+  //   } catch (error) {
+  //     console.error("API 요청 실패:", error);
+  //   }
+  // };
 
-  const handleCloseSuccessPopup = () => {
-    setShowSuccessPopup(false);
-    // 여기에 인증 내역 확인 페이지로 이동하는 로직을 추가
-  };
+  // const handleCloseSuccessPopup = () => {
+  //   setShowSuccessPopup(false);
+  //   // 여기에 인증 내역 확인 페이지로 이동하는 로직을 추가
+  // };
+
+  //  verification/payment/{id}/result
+  const { data: paymentVerificationResult, refetch: refetchPaymentVerificationResult } = useQuery({
+    queryKey: ["paymentVerificationResult"],
+    queryFn: () => getPaymentVerificationResult(verificationStart?.id),
+    enabled: !!verificationStart?.id,
+  });
+
+  useEffect(() => {
+    console.log("verificationStart", verificationStart);
+    console.log("paymentVerificationResult", paymentVerificationResult);
+    // if (paymentVerificationResult) {
+    //   console.log(paymentVerificationStatus);
+    //   const status = refetchPaymentVerificationStatus();
+    //   console.log(status);
+    // }
+  }, [paymentVerificationResult]);
 
   return (
     <div>
@@ -82,10 +112,10 @@ const ScreenPage = () => {
           </button>
           <p className="title-sm text-gray-80 text-center w-full ml-[-36px]">저축 인증하기</p>
         </div>
-        {selectedImage && (
+        {imageUrl && (
           <div className="flex justify-center relative">
             <Image
-              src={selectedImage}
+              src={imageUrl}
               alt="Uploaded Passbook"
               width={320}
               height={240}
@@ -151,7 +181,7 @@ const ScreenPage = () => {
         {/* 하단 버튼 */}
         <div className="fixed bottom-[20px] left-0 right-0">
           <div className="flex flex-col justify-center items-center">
-            <p className="title-xs text-gray-80">김모아님 인증 내역이 맞는지</p>
+            <p className="title-xs text-gray-80">인증 내역이 맞는지</p>
             <p className="title-xs text-gray-80">다시 한번 확인해주세요.</p>
           </div>
 

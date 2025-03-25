@@ -548,7 +548,7 @@ const RegisterPage = () => {
               </div> */}
               <div className="fixed bottom-[20px] left-0 right-0">
                 <div className="flex flex-col justify-center items-center">
-                  <p className="title-xs text-gray-80">김모아님 통장 계좌번호와</p>
+                  <p className="title-xs text-gray-80">통장 계좌번호와</p>
                   <p className="title-xs text-gray-80">잔액이 맞는지 다시 한번 확인해주세요.</p>
                 </div>
 

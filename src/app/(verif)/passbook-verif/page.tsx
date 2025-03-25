@@ -7,27 +7,19 @@ import press from "src/assets/images/press.png";
 import check from "src/assets/icon-check.svg";
 import { useRouter } from "next/navigation";
 import { useAtom } from "jotai";
-import { selectedImageAtom, isLoadingAtom, updatePassbookDataAtom } from "src/_store/passbookAtoms";
+import { selectedImageAtom, imageUrlAtom, verificationStartAtom } from "src/_store/passbookAtoms";
 import x from "src/assets/icon-x.svg";
 import { startPaymentVerification } from "src/_api/api";
 import { useMutation } from "@tanstack/react-query";
-import { VerificationRequest } from "src/_types/type";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 const PassbookVerifiPage = () => {
   const router = useRouter();
   const [selectedImage, setSelectedImage] = useAtom(selectedImageAtom as any);
-  const [isLoading, setIsLoading] = useAtom(isLoadingAtom);
-  const [, updatePassbookData] = useAtom(updatePassbookDataAtom);
-  const [request, setRequest] = useState<{
-    bank: "KAKAO_BANK" | "SHINHAN" | "WOORI" | "KB" | "NH" | "HANA" | "IBK" | "TOSS_BANK";
-    imgFile: File | null;
-  }>({
-    bank: "KAKAO_BANK",
-    imgFile: null,
-  });
+  const [imageUrl, setImageUrl] = useAtom(imageUrlAtom);
+  const [, setVerificationStart] = useAtom(verificationStartAtom);
 
-  const { mutate: mutatePaymentVerification } = useMutation({
+  const { mutate: mutatePaymentVerification, data: startVerificationData } = useMutation({
     mutationFn: () => {
       if (!selectedImage || !(selectedImage instanceof File)) {
         throw new Error("Invalid image file");
@@ -40,26 +32,42 @@ const PassbookVerifiPage = () => {
     const file = event.target.files?.[0];
     if (file) {
       setSelectedImage(file);
-      console.log("file", file);
+
+      // 기존 URL이 있다면 해제 (메모리 누수 방지)
+      if (imageUrl) {
+        URL.revokeObjectURL(imageUrl);
+      }
+
+      // 새로운 임시 URL 생성 및 상태 업데이트
+      const newImageUrl = window.URL.createObjectURL(file);
+      setImageUrl(newImageUrl);
+      console.log("newImageUrl", newImageUrl);
+    } else {
+      // 파일 선택이 취소된 경우
+      setSelectedImage(null);
+      if (imageUrl) {
+        URL.revokeObjectURL(imageUrl);
+      }
     }
   };
 
   useEffect(() => {
-    if (selectedImage) {
-      console.log(selectedImage);
-      mutatePaymentVerification();
-    }
+    verifyImage();
   }, [selectedImage]);
 
-  //       router.push("/passbook-verif/screen");
-  //     } catch (error) {
-  //       console.error("Error uploading passbook image:", error);
-  //       alert("통장 인증에 실패했습니다. 다시 시도해주세요.");
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   }
-  // };
+  const verifyImage = async () => {
+    if (selectedImage) {
+      mutatePaymentVerification();
+    }
+  };
+
+  useEffect(() => {
+    console.log("paymentVerificationData", startVerificationData);
+    if (startVerificationData) {
+      setVerificationStart(startVerificationData);
+      router.push("/passbook-verif/screen");
+    }
+  }, [startVerificationData]);
 
   return (
     <div className="w-full mx-auto flex flex-col items-center h-screen min-h-screen">
@@ -70,9 +78,10 @@ const PassbookVerifiPage = () => {
         <p className="title-sm text-gray-80 text-center w-full ml-[-36px]">저축 인증하기</p>
       </div>
       <div className="bg-gray-5 border border-gray-20 rounded-[16px] w-[320px] h-[280px] flex flex-col items-center justify-center mx-[20px]">
-        {selectedImage ? (
+        {imageUrl}
+        {imageUrl ? (
           <Image
-            src={selectedImage as any}
+            src={imageUrl}
             alt="Uploaded Passbook"
             width={320}
             height={280}
