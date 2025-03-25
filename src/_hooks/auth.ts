@@ -13,6 +13,7 @@ export const useAuth = () => {
   } = useQuery({
     queryKey: ["user"],
     queryFn: () => getMe(),
+    retry: false,
   });
 
   useEffect(() => {
@@ -24,13 +25,10 @@ export const useAuth = () => {
   const handleError = async (error: AxiosError) => {
     if (isError) {
       const statusCode = error.response?.status;
-      const errorCode = (error.response?.data as { code?: string })?.code;
-
-      if (statusCode === 401 && errorCode === "UNAUTHORIZED") {
-        alert("로그인이 필요해요.");
+      if (statusCode === 401) {
         router.push("/login");
       }
-      router.push("/login");
+      console.log("error", error);
     }
   };
   return { user };
