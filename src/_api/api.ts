@@ -130,9 +130,19 @@ export const startAccountVerification = (request: BankType, imgFile: FormData) =
 
 export const startPaymentVerification = (bank: BankType, imgFile: File) => {
   const formData = new FormData();
+  console.log("imgFile", imgFile instanceof File); // true 여야 함
   formData.append("imgFile", imgFile);
-  formData.append("request", JSON.stringify({ bank }));
-  return api.post("/verification/payment/start", formData);
+  formData.append(
+    "request",
+    new Blob([JSON.stringify({ bank })], {
+      type: "application/json",
+    })
+  );
+  return api.post("/verification/payment/start", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 };
 
 export const getAccountVerificationStatus = (verificationId: string) =>

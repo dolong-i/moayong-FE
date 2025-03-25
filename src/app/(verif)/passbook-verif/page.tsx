@@ -29,19 +29,18 @@ const PassbookVerifiPage = () => {
 
   const { mutate: mutatePaymentVerification } = useMutation({
     mutationFn: () => {
-      return startPaymentVerification("KAKAO_BANK", selectedImage as any);
+      if (!selectedImage || !(selectedImage instanceof File)) {
+        throw new Error("Invalid image file");
+      }
+      return startPaymentVerification("KAKAO_BANK", selectedImage);
     },
   });
 
-  const handleImageUpload = async (event: any) => {
-    const file = event.target.files[0];
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = async (e: any) => {
-        setSelectedImage(e.target.result);
-        // mutatePaymentVerification();
-      };
-      reader.readAsDataURL(file);
+      setSelectedImage(file);
+      console.log("file", file);
     }
   };
 
